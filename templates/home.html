@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block title %}Página de Inicio{% endblock %}
+
+{% block content %}
+<div class="p-5 mb-4 bg-light rounded-3">
+    <div class="container-fluid py-5">
+        <h1 class="display-5 fw-bold">Bienvenido a Mi Aplicación</h1>
+        <p class="col-md-8 fs-4">
+            {% if user.is_authenticated %}
+                Has iniciado sesión correctamente. ¡Explora el sitio!
+            {% else %}
+                Este es el portal de inicio. Por favor, inicia sesión o regístrate para continuar.
+            {% endif %}
+        </p>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,51 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Mi Aplicación{% endblock %}</title>
+    <!-- Tailwind CSS compilado localmente -->
+    <link href="{% static 'css/output.css' %}" rel="stylesheet">
+</head>
+<body class="bg-gray-100 font-sans text-gray-800">
+
+    <nav class="bg-gray-800 p-4 shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto flex justify-between items-center">
+            <a class="text-white text-xl font-bold" href="{% url 'home' %}">Mi App</a>
+            
+            <!-- Links para escritorio -->
+            <div class="hidden md:flex items-center space-x-4">
+                 {% if user.is_authenticated %}
+                    <a href="{% url 'profile' %}" class="text-gray-300 hover:text-white transition-colors">Mi Perfil</a>
+                    <a href="{% url 'gestion_flota:vehiculo_list' %}" class="text-gray-300 hover:text-white transition-colors">Mi Flota</a>
+                    <span class="text-gray-400">|</span>
+                    <span class="text-gray-300">
+                        Hola, {{ user.first_name|default:user.email }}!
+                    </span>
+                    <form action="{% url 'logout' %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition-colors">Logout</button>
+                    </form>
+                {% else %}
+                    <a href="{% url 'login' %}" class="text-gray-300 hover:text-white transition-colors">Login</a>
+                    <a href="{% url 'signup' %}" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition-colors">Sign Up</a>
+                {% endif %}
+            </div>
+
+            <!-- Menú hamburguesa para móvil (Añadir JS para la funcionalidad de toggle) -->
+            <div class="md:hidden">
+                <button class="text-white focus:outline-none">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container mx-auto mt-6 p-4">
+        {% block content %}
+        {% endblock %}
+    </main>
+
+</body>
+</html>

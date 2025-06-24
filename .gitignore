@@ -1,0 +1,80 @@
+logs/
+venv/# Archivos de Entorno
+# ------------------------------------------------------------------------------
+# Nunca subas tus variables de entorno, que contienen secretos y credenciales.
+.env
+.env.*
+
+# Dependencias de Python
+# ------------------------------------------------------------------------------
+# La carpeta del entorno virtual, que contiene todas las librerías instaladas.
+# Cada desarrollador crea la suya propia a partir de requirements.txt.
+env/
+venv/
+ENV/
+venv.bak/
+env.bak/
+
+# Caché y archivos compilados de Python.
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Archivos de instalación de pip y eggs.
+*.egg-info/
+*.egg
+pip-wheel-metadata/
+.installed.cfg
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Dependencias de Frontend (Node.js)
+# ------------------------------------------------------------------------------
+# La carpeta node_modules puede ser muy pesada y se reinstala con 'npm install'.
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Archivos de Django
+# ------------------------------------------------------------------------------
+# Base de datos local de SQLite (si la usaras en algún momento).
+db.sqlite3
+db.sqlite3-journal
+
+# Archivos estáticos y de medios recolectados para producción.
+# Estos se generan en el servidor con 'collectstatic'.
+staticfiles/
+media/
+
+# Archivos de Log
+# ------------------------------------------------------------------------------
+# No es necesario versionar los logs de la aplicación.
+logs/
+*.log
+
+# Archivos de Cobertura de Tests
+# ------------------------------------------------------------------------------
+.coverage
+.coverage.*
+htmlcov/
+.pytest_cache/
+
+# Archivos de Sistema Operativo y Editor de Código
+# ------------------------------------------------------------------------------
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Archivos de configuración de editores comunes
+.idea/
+.vscode/
+*.swp
+*~

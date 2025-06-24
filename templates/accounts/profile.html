@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <div class="bg-white rounded-xl shadow-lg p-6 sm:p-8">
+        <h1 class="text-2xl sm:text-3xl font-bold text-gray-800 mb-6">Mi Perfil</h1>
+        
+        <!-- El 'enctype' es CRUCIAL para la subida de archivos/imágenes -->
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Columna del Avatar -->
+                <div class="md:col-span-1 text-center">
+                    <label for="{{ form.avatar.id_for_label }}" class="block text-gray-700 text-sm font-semibold mb-2">Foto de Perfil</label>
+                    {% if user.profile.avatar %}
+                        <img src="{{ user.profile.avatar.url }}" alt="Avatar de {{ user.get_full_name }}" class="w-32 h-32 sm:w-40 sm:h-40 rounded-full mx-auto object-cover shadow-md mb-4">
+                    {% else %}
+                        <div class="w-32 h-32 sm:w-40 sm:h-40 rounded-full mx-auto bg-gray-200 flex items-center justify-center mb-4">
+                            <span class="text-gray-500">Sin foto</span>
+                        </div>
+                    {% endif %}
+                    {{ form.avatar }}
+                    {% if form.avatar.errors %}
+                        {% for error in form.avatar.errors %}
+                            <p class="text-red-500 text-xs italic mt-2">{{ error }}</p>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+
+                <!-- Columna de Información -->
+                <div class="md:col-span-2 space-y-4">
+                    <div>
+                        <label class="block text-gray-700 text-sm font-semibold mb-1">Nombre Completo</label>
+                        <p class="p-3 bg-gray-100 rounded-lg">{{ user.get_full_name }}</p>
+                    </div>
+                     <div>
+                        <label class="block text-gray-700 text-sm font-semibold mb-1">Email</label>
+                        <p class="p-3 bg-gray-100 rounded-lg">{{ user.email }}</p>
+                    </div>
+                    <div>
+                        <label for="{{ form.bio.id_for_label }}" class="block text-gray-700 text-sm font-semibold mb-1">Biografía</label>
+                        {{ form.bio }}
+                    </div>
+                     <div>
+                        <label for="{{ form.birth_date.id_for_label }}" class="block text-gray-700 text-sm font-semibold mb-1">Fecha de Nacimiento</label>
+                        {{ form.birth_date }}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-8 text-right">
+                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg focus:outline-none focus:shadow-outline transition-transform transform hover:scale-105">
+                    Guardar Cambios
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    /* Estilos para los widgets del formulario */
+    textarea,
+    input[type='date'] {
+        display: block;
+        width: 100%;
+        padding: 0.75rem;
+        border-radius: 0.5rem;
+        border: 1px solid #D1D5DB; /* gray-300 */
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    input[type='file'] {
+        display: block;
+        width: 100%;
+        margin-top: 0.5rem;
+        font-size: 0.875rem;
+        color: #4B5563; /* gray-600 */
+    }
+    input:focus,
+    textarea:focus {
+        outline: none;
+        border-color: #3B82F6; /* blue-500 */
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,73 @@
+# Archivo .dockerignore
+# ------------------------------------------------------------------------------
+# Este archivo previene que archivos y directorios innecesarios sean copiados
+# al contexto de construcción de Docker, optimizando el proceso y el tamaño
+# de la imagen final.
+
+# Control de versiones
+# ------------------------------------------------------------------------------
+# Nunca incluyas el historial de Git en tu imagen de Docker.
+.git/
+.gitignore
+
+# El propio archivo .dockerignore no necesita ser parte de la imagen.
+.dockerignore
+
+# Dependencias y Entornos Locales
+# ------------------------------------------------------------------------------
+# Las dependencias de Python deben ser instaladas DENTRO del contenedor
+# usando requirements.txt, no copiadas desde el entorno local.
+env/
+venv/
+ENV/
+
+# Las dependencias de Node.js se deben instalar DENTRO del contenedor
+# o los archivos compilados se deben copiar, pero no toda la carpeta.
+node_modules/
+
+# Variables de entorno y secretos locales.
+# Estos deben ser inyectados en el contenedor en tiempo de ejecución.
+.env
+.env.*
+
+# Base de datos local
+# ------------------------------------------------------------------------------
+# La base de datos local nunca debe ser parte de la imagen.
+db.sqlite3
+db.sqlite3-journal
+
+# Archivos de la Aplicación Django
+# ------------------------------------------------------------------------------
+# Los archivos de medios subidos por los usuarios no deben estar en la imagen.
+# Se deben manejar con volúmenes o almacenamiento en la nube como S3.
+media/
+
+# Los archivos estáticos recolectados no necesitan estar en el contexto de
+# compilación si los vas a generar dentro del Dockerfile. Si tu estrategia es
+# copiarlos, puedes comentar esta línea.
+staticfiles/
+
+# Caché y Logs
+# ------------------------------------------------------------------------------
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+logs/
+*.log
+
+# Archivos de Cobertura y Tests
+# ------------------------------------------------------------------------------
+.coverage
+.coverage.*
+htmlcov/
+.pytest_cache/
+
+# Archivos de Sistema Operativo y Editor de Código
+# ------------------------------------------------------------------------------
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*~

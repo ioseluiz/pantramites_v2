@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block title %}Detalle de Vehículo: {{ vehiculo.placa }}{% endblock %}
+
+{% block content %}
+<div class="bg-white p-4 sm:p-6 lg:p-8 rounded-lg shadow-lg">
+    <!-- Encabezado -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between border-b pb-4 mb-6">
+        <div>
+            <h1 class="text-2xl lg:text-3xl font-bold text-gray-900">{{ vehiculo.modelo.marca }} {{ vehiculo.modelo }}</h1>
+            <p class="text-lg lg:text-xl text-gray-600 font-mono bg-gray-200 inline-block px-3 py-1 rounded mt-2">{{ vehiculo.placa }}</p>
+        </div>
+        <div class="mt-4 md:mt-0 text-left md:text-right">
+            <span class="text-sm font-semibold py-1 px-3 rounded-full uppercase
+                {% if vehiculo.estado_placa == 'VIGENTE' %} bg-green-200 text-green-800 {% endif %}
+                {% if vehiculo.estado_placa == 'POR_VENCER' %} bg-yellow-200 text-yellow-800 {% endif %}
+                {% if vehiculo.estado_placa == 'VENCIDO' %} bg-red-200 text-red-800 {% endif %}">
+                Placa {{ vehiculo.get_estado_placa_display }}
+            </span>
+        </div>
+    </div>
+
+    <!-- Contenido Principal -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Columna de Información -->
+        <div class="lg:col-span-2">
+            <h2 class="text-xl lg:text-2xl font-semibold text-gray-800 mb-4">Información del Vehículo</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-gray-700">
+                <div class="bg-gray-50 p-3 rounded-md"><strong>Año:</strong> {{ vehiculo.año }}</div>
+                <div class="bg-gray-50 p-3 rounded-md"><strong>Color:</strong> {{ vehiculo.color }}</div>
+                <div class="bg-gray-50 p-3 rounded-md"><strong>Propietario:</strong> {{ vehiculo.propietario.get_full_name|default:"N/A" }}</div>
+                <div class="bg-gray-50 p-3 rounded-md"><strong>Municipio Placa:</strong> {{ vehiculo.municipio_placa|default:"N/A" }}</div>
+                <div class="bg-gray-50 p-3 rounded-md"><strong>Tipo Combustible:</strong> {{ vehiculo.get_tipo_combustible_display }}</div>
+                <div class="bg-gray-50 p-3 rounded-md"><strong>Número de Motor:</strong> {{ vehiculo.numero_motor|default:"N/A" }}</div>
+                <div class="bg-gray-50 p-3 rounded-md"><strong>Vehículo de Carga:</strong> {% if vehiculo.is_carga %}Sí{% else %}No{% endif %}</div>
+                <div class="bg-gray-50 p-3 rounded-md"><strong>Acreedor Hipotecario:</strong> {% if vehiculo.acreedor_hipotecario %}Sí{% else %}No{% endif %}</div>
+            </div>
+        </div>
+
+        <!-- Columna de Guantera Digital -->
+        <div>
+            <h2 class="text-xl lg:text-2xl font-semibold text-gray-800 mb-4">Guantera Digital</h2>
+            <div class="space-y-3">
+                {% if fotos %}
+                    {% for foto in fotos %}
+                    <a href="{{ foto.foto.url }}" target="_blank" class="flex items-center bg-blue-50 hover:bg-blue-100 p-3 rounded-lg transition-colors duration-200">
+                        <span class="text-blue-600">📷</span>
+                        <span class="ml-3 font-medium text-blue-800">Ver Foto: {{ foto.descripcion|default:'Principal' }}</span>
+                    </a>
+                    {% endfor %}
+                {% endif %}
+
+                {% if registro_unico %}
+                <a href="{{ registro_unico.archivo_pdf.url }}" target="_blank" class="flex items-center bg-gray-50 hover:bg-gray-100 p-3 rounded-lg transition-colors duration-200">
+                    <span class="text-gray-600">📄</span>
+                    <span class="ml-3 font-medium text-gray-800">Registro Único Vehicular</span>
+                </a>
+                {% else %}
+                 <div class="flex items-center bg-gray-50 p-3 rounded-lg">
+                    <span class="text-gray-400">📄</span>
+                    <span class="ml-3 text-gray-500">Sin Registro Único</span>
+                </div>
+                {% endif %}
+                
+                <!-- Añadir aquí los enlaces para los demás documentos de la guantera -->
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

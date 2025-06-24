@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block title %}Iniciar Sesión{% endblock %}
+
+{% block content %}
+<div class="max-w-md w-full mx-auto bg-white p-6 sm:p-8 rounded-xl shadow-lg mt-8 sm:mt-16">
+    <h2 class="text-2xl sm:text-3xl font-bold text-center text-gray-800 mb-6">Iniciar Sesión</h2>
+    
+    {% if form.errors %}
+    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg relative mb-6" role="alert">
+        <strong class="font-bold">Error:</strong>
+        <span class="block sm:inline">Por favor, introduce un email y contraseña correctos.</span>
+    </div>
+    {% endif %}
+
+    <form method="post">
+        {% csrf_token %}
+        <div class="space-y-4">
+            <div>
+                <label for="{{ form.username.id_for_label }}" class="block text-gray-700 text-sm font-semibold mb-2">Email</label>
+                {{ form.username }}
+            </div>
+            <div>
+                <label for="{{ form.password.id_for_label }}" class="block text-gray-700 text-sm font-semibold mb-2">Contraseña</label>
+                {{ form.password }}
+            </div>
+        </div>
+
+        <div class="mt-8">
+            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg focus:outline-none focus:shadow-outline transition-transform transform hover:scale-105">
+                Login
+            </button>
+        </div>
+    </form>
+    <p class="text-center text-gray-600 text-sm mt-6">
+        ¿No tienes una cuenta?
+        <a href="{% url 'signup' %}" class="font-bold text-blue-600 hover:text-blue-800">
+            Regístrate aquí
+        </a>
+    </p>
+</div>
+
+<!-- Estilos para los widgets del formulario -->
+<style>
+    input[type='text'],
+    input[type='email'],
+    input[type='password'] {
+        display: block;
+        width: 100%;
+        padding: 0.75rem;
+        border-radius: 0.5rem;
+        border: 1px solid #D1D5DB; /* gray-300 */
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    input:focus {
+        outline: none;
+        border-color: #3B82F6; /* blue-500 */
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+    }
+</style>
+{% endblock %}

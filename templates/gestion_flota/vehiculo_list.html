@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Mi Flota - {{ empresa.nombre|default:'Sin Empresa' }}{% endblock %}
+
+{% block content %}
+<div class="mb-6 px-4 sm:px-0 flex flex-col sm:flex-row justify-between items-start sm:items-center">
+    <div>
+        <h1 class="text-2xl sm:text-3xl font-bold text-gray-800">Flota de Vehículos</h1>
+        <p class="text-gray-600 mt-1">Vehículos registrados para la empresa: <span class="font-semibold">{{ empresa.nombre|default:'N/A' }}</span></p>
+    </div>
+    <div class="mt-4 sm:mt-0">
+        <a href="{% url 'gestion_flota:vehiculo_create' %}" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white font-semibold text-sm rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
+            <svg class="w-5 h-5 mr-2 -ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+            Registrar Vehículo
+        </a>
+    </div>
+</div>
+
+{% if vehiculos %}
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+    {% for vehiculo in vehiculos %}
+    <div class="bg-white rounded-lg shadow-md overflow-hidden transform hover:-translate-y-1 transition-transform duration-300 flex flex-col">
+        <a href="{% url 'gestion_flota:vehiculo_detail' vehiculo.pk %}">
+            {% with vehiculo.fotos.first as primera_foto %}
+                {% if primera_foto %}
+                    <img class="h-48 w-full object-cover" src="{{ primera_foto.foto.url }}" alt="[Imagen de {{ vehiculo.modelo }}]">
+                {% else %}
+                    <div class="h-48 w-full bg-gray-200 flex items-center justify-center">
+                        <span class="text-gray-500">Sin foto</span>
+                    </div>
+                {% endif %}
+            {% endwith %}
+        </a>
+        <div class="p-4 flex-grow flex flex-col">
+            <h2 class="text-lg font-bold text-gray-900">{{ vehiculo.modelo.marca }} {{ vehiculo.modelo }}</h2>
+            <p class="text-gray-700 mt-1">Placa: <span class="font-mono bg-gray-200 px-2 py-1 rounded text-sm">{{ vehiculo.placa }}</span></p>
+            <p class="text-sm text-gray-500 mt-1">Año: {{ vehiculo.año }}</p>
+            <div class="mt-4 text-right flex-grow flex items-end justify-end">
+                <a href="{% url 'gestion_flota:vehiculo_detail' vehiculo.pk %}" class="text-blue-600 hover:text-blue-800 font-semibold text-sm">Ver Detalles →</a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="text-center bg-white p-8 sm:p-12 rounded-lg shadow-md mt-8">
+    <div class="mx-auto w-16 h-16 text-gray-400">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-full w-full" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+    </div>
+    <h2 class="mt-4 text-xl sm:text-2xl font-semibold text-gray-700">No hay vehículos registrados</h2>
+    <p class="text-gray-500 mt-2">Parece que aún no has añadido ningún vehículo a tu flota.</p>
+    <a href="{% url 'gestion_flota:vehiculo_create' %}" class="mt-6 inline-block px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
+        Registra tu primer vehículo
+    </a>
+</div>
+{% endif %}
+{% endblock %}

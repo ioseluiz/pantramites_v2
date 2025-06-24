@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <div class="bg-white rounded-xl shadow-lg p-6 sm:p-8">
+        <h1 class="text-2xl sm:text-3xl font-bold text-gray-800 mb-6">{{ page_title }}</h1>
+        
+        <form method="post" novalidate>
+            {% csrf_token %}
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+                
+                <!-- Campos del formulario renderizados individualmente para mejor control -->
+                <div>
+                    <label for="{{ form.placa.id_for_label }}" class="block text-sm font-semibold text-gray-700 mb-1">Placa</label>
+                    {{ form.placa }}
+                    {% if form.placa.errors %}<p class="text-red-500 text-xs mt-1">{{ form.placa.errors.as_text }}</p>{% endif %}
+                </div>
+                
+                <div>
+                    <label for="{{ form.modelo.id_for_label }}" class="block text-sm font-semibold text-gray-700 mb-1">Marca y Modelo</label>
+                    {{ form.modelo }}
+                    {% if form.modelo.errors %}<p class="text-red-500 text-xs mt-1">{{ form.modelo.errors.as_text }}</p>{% endif %}
+                </div>
+
+                <div>
+                    <label for="{{ form.año.id_for_label }}" class="block text-sm font-semibold text-gray-700 mb-1">Año de Fabricación</label>
+                    {{ form.año }}
+                    {% if form.año.errors %}<p class="text-red-500 text-xs mt-1">{{ form.año.errors.as_text }}</p>{% endif %}
+                </div>
+
+                <div>
+                    <label for="{{ form.municipio_placa.id_for_label }}" class="block text-sm font-semibold text-gray-700 mb-1">Municipio de la Placa</label>
+                    {{ form.municipio_placa }}
+                    {% if form.municipio_placa.errors %}<p class="text-red-500 text-xs mt-1">{{ form.municipio_placa.errors.as_text }}</p>{% endif %}
+                </div>
+                
+                <div class="md:col-span-2">
+                    <label for="{{ form.numero_motor.id_for_label }}" class="block text-sm font-semibold text-gray-700 mb-1">Número de Motor</label>
+                    {{ form.numero_motor }}
+                    {% if form.numero_motor.errors %}<p class="text-red-500 text-xs mt-1">{{ form.numero_motor.errors.as_text }}</p>{% endif %}
+                </div>
+
+                <div>
+                    <label for="{{ form.color.id_for_label }}" class="block text-sm font-semibold text-gray-700 mb-1">Color</label>
+                    {{ form.color }}
+                </div>
+
+                <div>
+                    <label for="{{ form.tipo_combustible.id_for_label }}" class="block text-sm font-semibold text-gray-700 mb-1">Tipo de Combustible</label>
+                    {{ form.tipo_combustible }}
+                </div>
+
+                <div>
+                    <label for="{{ form.fecha_adquisicion.id_for_label }}" class="block text-sm font-semibold text-gray-700 mb-1">Fecha de Adquisición</label>
+                    {{ form.fecha_adquisicion }}
+                </div>
+
+                <div class="space-y-2">
+                    <div class="flex items-center">
+                        {{ form.is_carga }}
+                        <label for="{{ form.is_carga.id_for_label }}" class="ml-3 text-sm font-semibold text-gray-700">Es vehículo de carga</label>
+                    </div>
+                    <div class="flex items-center">
+                        {{ form.acreedor_hipotecario }}
+                        <label for="{{ form.acreedor_hipotecario.id_for_label }}" class="ml-3 text-sm font-semibold text-gray-700">Tiene acreedor hipotecario</label>
+                    </div>
+                </div>
+
+            </div>
+            
+            <div class="mt-8 border-t pt-6 flex justify-end items-center space-x-4">
+                <a href="{% url 'gestion_flota:vehiculo_list' %}" class="text-gray-600 hover:text-gray-800">Cancelar</a>
+                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg focus:outline-none focus:shadow-outline transition-transform transform hover:scale-105">
+                    Guardar Vehículo
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+<style>
+    /* Estilos para los checkboxes */
+    input[type='checkbox'] {
+        height: 1.25rem;
+        width: 1.25rem;
+        border-radius: 0.25rem;
+        border-color: #D1D5DB;
+        color: #3B82F6;
+        transition: all 0.2s;
+    }
+    input[type='checkbox']:focus {
+        --tw-ring-color: #3B82F6;
+        --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
+        --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(3px + var(--tw-ring-offset-width)) var(--tw-ring-color);
+        box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000);
+        outline: 2px solid transparent;
+        outline-offset: 2px;
+    }
+</style>
+{% endblock %}
