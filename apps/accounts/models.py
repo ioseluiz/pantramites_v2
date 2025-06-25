@@ -2,19 +2,50 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.utils import timezone
 
+from apps.gestion_flota.models import Provincia, Municipio,Corregimiento
+
 # -----------------------------------------------------------------------------
 # MODELO EMPRESA
 # -----------------------------------------------------------------------------
 class Empresa(models.Model):
+    TIPO_EMPRESA_CHOICES = [
+        ('NATURAL', 'Natural'),
+        ('JURIDICA', 'Jurídica'),
+    ]
     nombre = models.CharField(max_length=255, unique=True, verbose_name='Nombre de la Empresa')
+    ruc = models.CharField(max_length=20, unique=True, verbose_name='RUC')
+    tipo = models.CharField(max_length=10, choices=TIPO_EMPRESA_CHOICES, default='JURIDICA', verbose_name='Tipo de Empresa')
+    # Direccion
+    provincia = models.ForeignKey(Provincia, on_delete=models.SET_NULL, null=True, blank=True, related_name='empresas', verbose_name='Provincia')
+    distrito = models.ForeignKey(Municipio, on_delete=models.SET_NULL, null=True, blank=True, related_name='empresas_por_distrito', verbose_name='Distrito')
+    corregimiento = models.ForeignKey(Corregimiento, on_delete=models.SET_NULL, null=True, blank=True, related_name='empresas', verbose_name='Corregimiento')
+    calle = models.CharField(max_length=255, blank=True, verbose_name='Calle o Avenida')
+    casa = models.CharField(max_length=50, blank=True, verbose_name='Casa o Edificio')
     direccion = models.CharField(max_length=255, blank=True, verbose_name='Dirección')
-    telefono = models.CharField(max_length=20, blank=True, verbose_name='Teléfono')
+
+    # Contacto
+    email_1 = models.EmailField(verbose_name='Email Principal')
+    email_2 = models.EmailField(blank=True, verbose_name='Email Secundario')
+    telefono_1 = models.CharField(max_length=20, verbose_name='Teléfono Principal')
+    telefono_2 = models.CharField(max_length=20, blank=True, verbose_name='Teléfono Secundario')
+
+    # Branding
+    url_logo_empresa = models.URLField(max_length=255, blank=True, verbose_name='URL del Logo')
+    
     fecha_creacion = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         verbose_name = 'Empresa'
         verbose_name_plural = 'Empresas'
         ordering = ['nombre']
+
+    def save(self, *args, **kwargs):
+        # Asigna automáticamente la provincia basado en el distrito/corregimiento seleccionado
+        if self.corregimiento:
+            self.distrito = self.corregimiento.municipio
+        if self.distrito:
+            self.provincia = self.distrito.provincia
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.nombre

@@ -1,0 +1,181 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ page_title|default:"Registrar Empresa" }}{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <div class="bg-white rounded-xl shadow-lg p-6 sm:p-8">
+        <h1 class="text-2xl sm:text-3xl font-bold text-gray-800 mb-6 border-b pb-4">{{ page_title }}</h1>
+        
+        <form id="empresaForm" method="post" novalidate>
+            {% csrf_token %}
+            <div class="space-y-8">
+                <!-- Sección de Información General -->
+                <section>
+                    <h2 class="text-lg font-semibold text-gray-700 mb-4">Información General</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="{{ form.nombre.id_for_label }}" class="form-label">Nombre de la Empresa <span class="text-red-500">*</span></label>
+                            {{ form.nombre }}
+                        </div>
+                        <div>
+                            <label for="{{ form.ruc.id_for_label }}" class="form-label">RUC <span class="text-red-500">*</span></label>
+                            {{ form.ruc }}
+                        </div>
+                        <div>
+                            <label for="{{ form.tipo.id_for_label }}" class="form-label">Tipo de Persona</label>
+                            {{ form.tipo }}
+                        </div>
+                         <div>
+                            <label for="{{ form.url_logo_empresa.id_for_label }}" class="form-label">URL del Logo</label>
+                            {{ form.url_logo_empresa }}
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Sección de Dirección -->
+                <section>
+                    <h2 class="text-lg font-semibold text-gray-700 mb-4">Dirección</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="{{ form.provincia.id_for_label }}" class="form-label">Provincia <span class="text-red-500">*</span></label>
+                            {{ form.provincia }}
+                        </div>
+                        <div>
+                            <label for="{{ form.distrito.id_for_label }}" class="form-label">Distrito <span class="text-red-500">*</span></label>
+                            {{ form.distrito }}
+                        </div>
+                        <div>
+                            <label for="{{ form.corregimiento.id_for_label }}" class="form-label">Corregimiento</label>
+                            {{ form.corregimiento }}
+                        </div>
+                        <div>
+                            <label for="{{ form.calle.id_for_label }}" class="form-label">Calle o Avenida</label>
+                            {{ form.calle }}
+                        </div>
+                        <div class="md:col-span-2">
+                            <label for="{{ form.casa.id_for_label }}" class="form-label">Casa o Edificio</label>
+                            {{ form.casa }}
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Sección de Contacto -->
+                <section>
+                    <h2 class="text-lg font-semibold text-gray-700 mb-4">Información de Contacto</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="{{ form.email_1.id_for_label }}" class="form-label">Email Principal <span class="text-red-500">*</span></label>
+                            {{ form.email_1 }}
+                        </div>
+                        <div>
+                            <label for="{{ form.email_2.id_for_label }}" class="form-label">Email Secundario</label>
+                            {{ form.email_2 }}
+                        </div>
+                        <div>
+                            <label for="{{ form.telefono_1.id_for_label }}" class="form-label">Teléfono Principal <span class="text-red-500">*</span></label>
+                            {{ form.telefono_1 }}
+                        </div>
+                        <div>
+                            <label for="{{ form.telefono_2.id_for_label }}" class="form-label">Teléfono Secundario</label>
+                            {{ form.telefono_2 }}
+                        </div>
+                    </div>
+                </section>
+            </div>
+            
+            <div class="mt-8 border-t pt-6 flex justify-end items-center space-x-4">
+                <a href="{% url 'home' %}" class="text-gray-600 hover:text-gray-800">Cancelar</a>
+                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg">Guardar Empresa</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    .form-label { @apply block text-sm font-semibold text-gray-700 mb-1; }
+    /* Se aumenta el padding horizontal (px-4) */
+    input[type='text'], input[type='email'], input[type='url'], select {
+        @apply block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all;
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const provinciaSelect = document.getElementById("{{ form.provincia.id_for_label }}");
+    const distritoSelect = document.getElementById("{{ form.distrito.id_for_label }}");
+    const corregimientoSelect = document.getElementById("{{ form.corregimiento.id_for_label }}");
+
+    provinciaSelect.addEventListener('change', function() {
+        const provinciaId = this.value;
+        distritoSelect.innerHTML = '<option value="">Cargando...</option>';
+        corregimientoSelect.innerHTML = '<option value="">-- Seleccionar un Distrito Primero --</option>';
+
+        if (!provinciaId) {
+            distritoSelect.innerHTML = '<option value="">-- Seleccionar una Provincia Primero --</option>';
+            return;
+        }
+
+        const url = `{% url 'ajax_load_distritos' %}?provincia_id=${provinciaId}`;
+        fetch(url)
+            .then(response => {
+                if (!response.ok) throw new Error('Error de red al cargar distritos.');
+                return response.json();
+            })
+            .then(data => {
+                let options = '<option value="">-- Seleccionar un Distrito --</option>';
+                data.forEach(function(distrito) {
+                    options += `<option value="${distrito.id}">${distrito.nombre}</option>`;
+                });
+                distritoSelect.innerHTML = options;
+            })
+            .catch(error => {
+                console.error('Error en fetch (distritos):', error);
+                distritoSelect.innerHTML = '<option value="">Error al cargar</option>';
+            });
+    });
+
+    distritoSelect.addEventListener('change', function() {
+        const distritoId = this.value;
+        console.log(`Distrito seleccionado. ID: ${distritoId}`); // Log de depuración
+        corregimientoSelect.innerHTML = '<option value="">Cargando corregimientos...</option>';
+
+        if (!distritoId) {
+            console.log("ID de distrito vacío. Reseteando corregimientos."); // Log de depuración
+            corregimientoSelect.innerHTML = '<option value="">-- Seleccionar un Distrito Primero --</option>';
+            return;
+        }
+
+        const url = `{% url 'ajax_load_corregimientos' %}?distrito_id=${distritoId}`;
+        console.log(`Haciendo fetch a la URL: ${url}`); // Log de depuración
+        
+        fetch(url)
+            .then(response => {
+                console.log("Respuesta del servidor para corregimientos recibida:", response); // Log de depuración
+                if (!response.ok) {
+                    throw new Error(`Error de red: ${response.status} ${response.statusText}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log("Datos JSON de corregimientos recibidos:", data); // Log de depuración
+                let options;
+                if (data.length > 0) {
+                    options = '<option value="">-- Seleccionar Corregimiento --</option>';
+                    data.forEach(function(corregimiento) {
+                        options += `<option value="${corregimiento.id}">${corregimiento.nombre}</option>`;
+                    });
+                } else {
+                    console.log("No se encontraron corregimientos para este distrito."); // Log de depuración
+                    options = '<option value="">-- No hay corregimientos disponibles --</option>';
+                }
+                corregimientoSelect.innerHTML = options;
+            })
+            .catch(error => {
+                console.error('Error durante el fetch de corregimientos:', error); // Log de depuración
+                corregimientoSelect.innerHTML = '<option value="">Error al cargar datos</option>';
+            });
+    });
+});
+</script>
+{% endblock %}

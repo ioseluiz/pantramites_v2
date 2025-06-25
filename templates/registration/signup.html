@@ -9,22 +9,74 @@
         {% csrf_token %}
         
         <div class="space-y-4">
-            {% for field in form %}
+            <!-- Renderizado explícito de cada campo para evitar errores -->
             <div>
-                <label for="{{ field.id_for_label }}" class="block text-gray-700 text-sm font-semibold mb-2">
-                    {{ field.label }}
-                </label>
-                {{ field }}
-                {% if field.errors %}
-                    {% for error in field.errors %}
-                    <p class="text-red-500 text-xs italic mt-2">{{ error }}</p>
+                <label for="{{ form.empresa.id_for_label }}" class="block text-gray-700 text-sm font-semibold mb-2">{{ form.empresa.label }}</label>
+                {{ form.empresa }}
+                {% if form.empresa.errors %}<p class="text-red-500 text-xs italic mt-2">{{ form.empresa.errors.as_text }}</p>{% endif %}
+            </div>
+            <div>
+                <label for="{{ form.email.id_for_label }}" class="block text-gray-700 text-sm font-semibold mb-2">{{ form.email.label }}</label>
+                {{ form.email }}
+                {% if form.email.errors %}<p class="text-red-500 text-xs italic mt-2">{{ form.email.errors.as_text }}</p>{% endif %}
+            </div>
+            <div>
+                <label for="{{ form.first_name.id_for_label }}" class="block text-gray-700 text-sm font-semibold mb-2">{{ form.first_name.label }}</label>
+                {{ form.first_name }}
+                {% if form.first_name.errors %}<p class="text-red-500 text-xs italic mt-2">{{ form.first_name.errors.as_text }}</p>{% endif %}
+            </div>
+            <div>
+                <label for="{{ form.last_name.id_for_label }}" class="block text-gray-700 text-sm font-semibold mb-2">{{ form.last_name.label }}</label>
+                {{ form.last_name }}
+                {% if form.last_name.errors %}<p class="text-red-500 text-xs italic mt-2">{{ form.last_name.errors.as_text }}</p>{% endif %}
+            </div>
+
+            <!-- Renderizado especial para el primer campo de contraseña -->
+            <div>
+                <label for="{{ form.password1.id_for_label }}" class="block text-gray-700 text-sm font-semibold mb-2">{{ form.password1.label }}</label>
+                <div class="relative">
+                    {{ form.password1 }}
+                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 cursor-pointer" onclick="togglePasswordVisibility('{{ form.password1.id_for_label }}')">
+                        <svg id="eye-icon-{{ form.password1.id_for_label }}" class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                        <svg id="eye-off-icon-{{ form.password1.id_for_label }}" class="h-5 w-5 hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7 1.274 4.057 5.064-7 9.542-7 .847 0 1.67.128 2.454.375M19.220 18.221c.54-.633.99-1.332 1.354-2.062a10.025 10.025 0 00-4.22-5.75M21 21L3 3" />
+                        </svg>
+                    </div>
+                </div>
+                {% if form.password1.errors %}
+                    {% for error in form.password1.errors %}
+                        <p class="text-red-500 text-xs italic mt-2">{{ error }}</p>
                     {% endfor %}
                 {% endif %}
-                {% if field.help_text %}
-                <p class="text-gray-500 text-xs italic mt-2">{{ field.help_text|safe }}</p>
+                {% if form.password1.help_text %}
+                    <p class="text-gray-500 text-xs italic mt-2">{{ form.password1.help_text|safe }}</p>
                 {% endif %}
             </div>
-            {% endfor %}
+            
+            <!-- Renderizado especial para el segundo campo de contraseña (confirmación) -->
+             <div>
+                <label for="{{ form.password2.id_for_label }}" class="block text-gray-700 text-sm font-semibold mb-2">{{ form.password2.label }}</label>
+                <div class="relative">
+                    {{ form.password2 }}
+                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 cursor-pointer" onclick="togglePasswordVisibility('{{ form.password2.id_for_label }}')">
+                        <svg id="eye-icon-{{ form.password2.id_for_label }}" class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                        <svg id="eye-off-icon-{{ form.password2.id_for_label }}" class="h-5 w-5 hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7 1.274 4.057 5.064-7 9.542-7 .847 0 1.67.128 2.454.375M19.220 18.221c.54-.633.99-1.332 1.354-2.062a10.025 10.025 0 00-4.22-5.75M21 21L3 3" />
+                        </svg>
+                    </div>
+                </div>
+                 {% if form.password2.errors %}
+                    {% for error in form.password2.errors %}
+                        <p class="text-red-500 text-xs italic mt-2">{{ error }}</p>
+                    {% endfor %}
+                {% endif %}
+            </div>
         </div>
 
         <div class="mt-8">
@@ -41,7 +93,6 @@
     </p>
 </div>
 
-<!-- Estilos para los widgets del formulario -->
 <style>
     input[type='text'],
     input[type='email'],
@@ -62,4 +113,22 @@
         box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
     }
 </style>
+
+<script>
+    function togglePasswordVisibility(fieldId) {
+        const passwordField = document.getElementById(fieldId);
+        const eyeIcon = document.getElementById('eye-icon-' + fieldId);
+        const eyeOffIcon = document.getElementById('eye-off-icon-' + fieldId);
+
+        if (passwordField.type === 'password') {
+            passwordField.type = 'text';
+            eyeIcon.classList.add('hidden');
+            eyeOffIcon.classList.remove('hidden');
+        } else {
+            passwordField.type = 'password';
+            eyeIcon.classList.remove('hidden');
+            eyeOffIcon.classList.add('hidden');
+        }
+    }
+</script>
 {% endblock %}

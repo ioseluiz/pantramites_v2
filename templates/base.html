@@ -5,7 +5,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Mi Aplicación{% endblock %}</title>
-    <!-- Tailwind CSS compilado localmente -->
     <link href="{% static 'css/output.css' %}" rel="stylesheet">
 </head>
 <body class="bg-gray-100 font-sans text-gray-800">
@@ -19,6 +18,9 @@
                  {% if user.is_authenticated %}
                     <a href="{% url 'profile' %}" class="text-gray-300 hover:text-white transition-colors">Mi Perfil</a>
                     <a href="{% url 'gestion_flota:vehiculo_list' %}" class="text-gray-300 hover:text-white transition-colors">Mi Flota</a>
+                    {% if user.is_staff %}
+                        <a href="{% url 'empresa_create' %}" class="text-gray-300 hover:text-white transition-colors">Registrar Empresa</a>
+                    {% endif %}
                     <span class="text-gray-400">|</span>
                     <span class="text-gray-300">
                         Hola, {{ user.first_name|default:user.email }}!
@@ -41,11 +43,63 @@
             </div>
         </div>
     </nav>
+    
+    <!-- Contenedor de Mensajes/Alertas -->
+    <div class="fixed top-5 right-5 z-50 w-full max-w-sm" id="messages-container">
+    {% if messages %}
+        {% for message in messages %}
+        <div class="message-alert flex items-center justify-between p-4 mb-4 rounded-lg shadow-xl text-white
+                    {% if message.tags == 'success' %} bg-green-500
+                    {% elif message.tags == 'error' %} bg-red-500
+                    {% else %} bg-blue-500 {% endif %}"
+             role="alert">
+            <p>
+                <strong class="font-bold">
+                {% if message.tags == 'success' %}¡Éxito!{% endif %}
+                {% if message.tags == 'error' %}¡Error!{% endif %}
+                {% if message.tags == 'info' %}Aviso:{% endif %}
+                </strong> {{ message }}
+            </p>
+            <button type="button" class="close-alert-btn ml-4 -mr-1 text-xl font-semibold leading-none">&times;</button>
+        </div>
+        {% endfor %}
+    {% endif %}
+    </div>
 
     <main class="container mx-auto mt-6 p-4">
         {% block content %}
         {% endblock %}
     </main>
 
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const messagesContainer = document.getElementById('messages-container');
+
+    // Función para cerrar una alerta
+    const closeAlert = (alert) => {
+        if (!alert) return;
+        alert.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+        alert.style.opacity = '0';
+        alert.style.transform = 'translateX(100%)';
+        setTimeout(() => alert.remove(), 500);
+    };
+
+    // Auto-dismiss de los mensajes después de 5 segundos
+    if (messagesContainer) {
+        setTimeout(function() {
+            let alerts = messagesContainer.querySelectorAll('.message-alert');
+            alerts.forEach(closeAlert);
+        }, 5000); // 5 segundos
+    }
+    
+    // Listener para el botón de cierre manual
+    document.body.addEventListener('click', function(event) {
+        if (event.target.classList.contains('close-alert-btn')) {
+            const alert = event.target.closest('.message-alert');
+            closeAlert(alert);
+        }
+    });
+});
+</script>
 </body>
 </html>
