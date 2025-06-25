@@ -13,34 +13,42 @@
         <div class="container mx-auto flex justify-between items-center">
             <!-- Logo de la Empresa -->
             <a href="{% url 'home' %}" class="flex-shrink-0">
-                <img class="h-8 w-auto" src="{% static 'images/logo.png' %}" alt="[Logo de la Empresa]">
+                <img class="h-8 sm:h-10 w-auto" src="{% static 'images/logo.png' %}" alt="[Logo de la Empresa]">
             </a>
             
             <!-- Links para escritorio -->
             <div class="hidden md:flex items-center space-x-4">
                  {% if user.is_authenticated %}
+                    {% if not user.is_staff %}
+                    <a href="{% url 'recordatorios:recordatorio_list' %}" title="Ver Recordatorios" class="relative text-gray-300 hover:text-white transition-colors p-2">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
+                        {% if unread_notification_count > 0 %}
+                            <span class="absolute top-1 right-1 h-5 w-5 text-xs flex items-center justify-center rounded-full bg-red-600 text-white font-mono">{{ unread_notification_count }}</span>
+                        {% endif %}
+                    </a>
+                    {% endif %}
                     <a href="{% url 'profile' %}" class="text-gray-300 hover:text-white transition-colors">Mi Perfil</a>
                     <a href="{% url 'gestion_flota:vehiculo_list' %}" class="text-gray-300 hover:text-white transition-colors">Mi Flota</a>
                     {% if user.is_staff %}
                         <a href="{% url 'empresa_create' %}" class="text-gray-300 hover:text-white transition-colors">Registrar Empresa</a>
                     {% endif %}
-                    <span class="text-gray-400">|</span>
+                    <span class="text-gray-500">|</span>
                     <span class="text-gray-300">
                         Hola, {{ user.first_name|default:user.email }}!
                     </span>
-                    <form action="{% url 'logout' %}" method="post">
+                    <form action="{% url 'logout' %}" method="post" class="m-0">
                         {% csrf_token %}
-                        <button type="submit" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition-colors">Logout</button>
+                        <button type="submit" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg transition-colors">Logout</button>
                     </form>
                 {% else %}
                     <a href="{% url 'login' %}" class="text-gray-300 hover:text-white transition-colors">Login</a>
-                    <a href="{% url 'signup' %}" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition-colors">Sign Up</a>
+                    <a href="{% url 'signup' %}" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition-colors">Sign Up</a>
                 {% endif %}
             </div>
 
-            <!-- Menú hamburguesa para móvil (Añadir JS para la funcionalidad de toggle) -->
+            <!-- Menú hamburguesa para móvil -->
             <div class="md:hidden">
-                <button class="text-white focus:outline-none">
+                <button class="text-white hover:text-gray-300 focus:outline-none">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
                 </button>
             </div>
@@ -78,7 +86,6 @@
 document.addEventListener('DOMContentLoaded', function() {
     const messagesContainer = document.getElementById('messages-container');
 
-    // Función para cerrar una alerta
     const closeAlert = (alert) => {
         if (!alert) return;
         alert.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
@@ -87,15 +94,13 @@ document.addEventListener('DOMContentLoaded', function() {
         setTimeout(() => alert.remove(), 500);
     };
 
-    // Auto-dismiss de los mensajes después de 5 segundos
     if (messagesContainer) {
         setTimeout(function() {
             let alerts = messagesContainer.querySelectorAll('.message-alert');
             alerts.forEach(closeAlert);
-        }, 5000); // 5 segundos
+        }, 5000); 
     }
     
-    // Listener para el botón de cierre manual
     document.body.addEventListener('click', function(event) {
         if (event.target.classList.contains('close-alert-btn')) {
             const alert = event.target.closest('.message-alert');
