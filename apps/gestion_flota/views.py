@@ -3,7 +3,7 @@ from django.views.generic import ListView, DetailView, CreateView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.urls import reverse_lazy
 from django.contrib import messages # Importar el framework de mensajes
-from .models import Vehiculo, Modelo
+from .models import Vehiculo, Modelo, Poliza, RevisadoVehicular, TarjetaPesosDimensiones
 from .forms import VehiculoForm
 from apps.guantera.models import FotoVehiculo, RegistroUnicoVehicular
 
@@ -68,6 +68,10 @@ class VehiculoDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
     context_object_name = 'vehiculo'
 
     def test_func(self):
+        """
+        Esta prueba de seguridad confirma que un usuario solo puede ver
+        detalles de un vehículo si este pertenece a su empresa.
+        """
         vehiculo = self.get_object()
         user = self.request.user
         if hasattr(user, 'empresa') and user.empresa is not None:
@@ -75,13 +79,33 @@ class VehiculoDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
         return False
         
     def get_context_data(self, **kwargs):
+        """
+        Añade todos los documentos y datos de la guantera al contexto
+        para ser mostrados en la plantilla y en el modal.
+        """
         context = super().get_context_data(**kwargs)
         vehiculo = self.get_object()
-        context['fotos'] = FotoVehiculo.objects.filter(vehiculo=vehiculo)
+
+        # Datos de la Flota (con estados)
         try:
-            context['registro_unico'] = RegistroUnicoVehicular.objects.get(vehiculo=vehiculo)
+            context['poliza'] = vehiculo.poliza
+        except Poliza.DoesNotExist:
+            context['poliza'] = None
+        
+        context['revisados'] = vehiculo.revisados.all().order_by('-fecha_vencimiento')
+        context['tarjetas_pd'] = vehiculo.tarjetas_pesos_dimensiones.all().order_by('-fecha_vencimiento')
+
+        # Documentos de la Guantera (los archivos PDF/Imágenes)
+        context['fotos'] = vehiculo.fotos.all()
+        
+        try:
+            context['doc_registro_unico'] = vehiculo.registro_unico
         except RegistroUnicoVehicular.DoesNotExist:
-            context['registro_unico'] = None
+            context['doc_registro_unico'] = None
+            
+        context['doc_stickers_placa'] = vehiculo.stickers_placa.all().order_by('-año')
+        context['doc_recibos_placa'] = vehiculo.recibos_placa.all().order_by('-fecha_pago')
+
         return context
 
 def load_modelos(request):

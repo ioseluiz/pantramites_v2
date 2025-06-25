@@ -5,28 +5,31 @@
 {% block content %}
 <div class="bg-white p-4 sm:p-6 lg:p-8 rounded-lg shadow-lg">
     <!-- Encabezado -->
-    <div class="flex flex-col md:flex-row md:items-center justify-between border-b pb-4 mb-6">
+    <div class="flex flex-col md:flex-row md:items-start justify-between border-b pb-4 mb-6">
         <div>
             <h1 class="text-2xl lg:text-3xl font-bold text-gray-900">{{ vehiculo.modelo.marca }} {{ vehiculo.modelo }}</h1>
             <p class="text-lg lg:text-xl text-gray-600 font-mono bg-gray-200 inline-block px-3 py-1 rounded mt-2">{{ vehiculo.placa }}</p>
         </div>
-        <div class="mt-4 md:mt-0 text-left md:text-right">
+        <div class="mt-4 md:mt-0 flex flex-col md:items-end space-y-3">
             <span class="text-sm font-semibold py-1 px-3 rounded-full uppercase
                 {% if vehiculo.estado_placa == 'VIGENTE' %} bg-green-200 text-green-800 {% endif %}
                 {% if vehiculo.estado_placa == 'POR_VENCER' %} bg-yellow-200 text-yellow-800 {% endif %}
                 {% if vehiculo.estado_placa == 'VENCIDO' %} bg-red-200 text-red-800 {% endif %}">
                 Placa {{ vehiculo.get_estado_placa_display }}
             </span>
+            <button id="open-guantera-btn" class="inline-flex items-center px-4 py-2 bg-gray-700 text-white font-semibold text-sm rounded-lg shadow-md hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors">
+                <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v2a2 2 0 01-2 2H7a2 2 0 01-2-2V4z"/><path d="M5 8a2 2 0 00-2 2v6a2 2 0 002 2h10a2 2 0 002-2v-6a2 2 0 00-2-2H5z"/></svg>
+                Ver Guantera
+            </button>
         </div>
     </div>
 
-    <!-- Contenido Principal -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <!-- Columna de Información -->
-        <div class="lg:col-span-2">
-            <h2 class="text-xl lg:text-2xl font-semibold text-gray-800 mb-4">Información del Vehículo</h2>
+    <!-- Contenido Principal de Información del Vehículo -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div>
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">Información del Vehículo</h2>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-gray-700">
-                <div class="bg-gray-50 p-3 rounded-md"><strong>Año:</strong> {{ vehiculo.año }}</div>
+                <div class="bg-gray-50 p-3 rounded-md"><strong>Año:</strong> {{ vehiculo.ano_fabricacion }}</div>
                 <div class="bg-gray-50 p-3 rounded-md"><strong>Color:</strong> {{ vehiculo.color }}</div>
                 <div class="bg-gray-50 p-3 rounded-md"><strong>Propietario:</strong> {{ vehiculo.propietario.get_full_name|default:"N/A" }}</div>
                 <div class="bg-gray-50 p-3 rounded-md"><strong>Municipio Placa:</strong> {{ vehiculo.municipio_placa|default:"N/A" }}</div>
@@ -36,36 +39,154 @@
                 <div class="bg-gray-50 p-3 rounded-md"><strong>Acreedor Hipotecario:</strong> {% if vehiculo.acreedor_hipotecario %}Sí{% else %}No{% endif %}</div>
             </div>
         </div>
-
-        <!-- Columna de Guantera Digital -->
         <div>
-            <h2 class="text-xl lg:text-2xl font-semibold text-gray-800 mb-4">Guantera Digital</h2>
-            <div class="space-y-3">
-                {% if fotos %}
-                    {% for foto in fotos %}
-                    <a href="{{ foto.foto.url }}" target="_blank" class="flex items-center bg-blue-50 hover:bg-blue-100 p-3 rounded-lg transition-colors duration-200">
-                        <span class="text-blue-600">📷</span>
-                        <span class="ml-3 font-medium text-blue-800">Ver Foto: {{ foto.descripcion|default:'Principal' }}</span>
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">Fotos</h2>
+            <div class="grid grid-cols-2 gap-4">
+                {% for foto in fotos %}
+                    <a href="{{ foto.foto.url }}" target="_blank">
+                        <img src="{{ foto.foto.url }}" alt="Foto del vehículo" class="rounded-lg shadow-md object-cover h-32 w-full">
                     </a>
-                    {% endfor %}
-                {% endif %}
-
-                {% if registro_unico %}
-                <a href="{{ registro_unico.archivo_pdf.url }}" target="_blank" class="flex items-center bg-gray-50 hover:bg-gray-100 p-3 rounded-lg transition-colors duration-200">
-                    <span class="text-gray-600">📄</span>
-                    <span class="ml-3 font-medium text-gray-800">Registro Único Vehicular</span>
-                </a>
-                {% else %}
-                 <div class="flex items-center bg-gray-50 p-3 rounded-lg">
-                    <span class="text-gray-400">📄</span>
-                    <span class="ml-3 text-gray-500">Sin Registro Único</span>
-                </div>
-                {% endif %}
-                
-                <!-- Añadir aquí los enlaces para los demás documentos de la guantera -->
-
+                {% empty %}
+                    <p class="text-gray-500 col-span-2">No hay fotos para este vehículo.</p>
+                {% endfor %}
             </div>
         </div>
     </div>
 </div>
+
+<!-- Modal de la Guantera -->
+<div id="guantera-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center p-4 z-50 hidden">
+    <div class="bg-white rounded-lg shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col">
+        <!-- Encabezado del Modal -->
+        <div class="flex justify-between items-center p-4 border-b">
+            <h2 class="text-xl font-bold text-gray-800">Guantera Digital: {{ vehiculo.placa }}</h2>
+            <button id="close-guantera-btn" class="text-gray-500 hover:text-gray-800 text-3xl">&times;</button>
+        </div>
+
+        <!-- Contenido del Modal -->
+        <div class="p-6 space-y-4 overflow-y-auto">
+            <!-- Póliza de Seguro -->
+            <div class="document-item">
+                <h3 class="font-semibold text-gray-700">Póliza de Seguro</h3>
+                {% if poliza %}
+                    <div class="document-details">
+                        <span class="status-badge status-{{ poliza.estado|lower }}">{{ poliza.get_estado_display }}</span>
+                        <a href="#" class="document-link">Ver/Subir Documento</a>
+                    </div>
+                {% else %}
+                    <p class="text-sm text-gray-500">No hay póliza registrada.</p>
+                {% endif %}
+            </div>
+            
+            <!-- Registro Único Vehicular -->
+            <div class="document-item">
+                <h3 class="font-semibold text-gray-700">Registro Único Vehicular</h3>
+                {% if doc_registro_unico %}
+                     <div class="document-details">
+                        <span class="status-badge status-vigente">Disponible</span>
+                        <a href="{{ doc_registro_unico.archivo_pdf.url }}" target="_blank" class="document-link">Ver Documento</a>
+                    </div>
+                {% else %}
+                    <p class="text-sm text-gray-500">No hay documento de registro.</p>
+                {% endif %}
+            </div>
+
+            <!-- Revisado Vehicular (último) -->
+            <div class="document-item">
+                <h3 class="font-semibold text-gray-700">Revisado Vehicular</h3>
+                {% with revisados.first as ultimo_revisado %}
+                {% if ultimo_revisado %}
+                    <div class="document-details">
+                        <span class="status-badge status-{{ ultimo_revisado.estado|lower }}">{{ ultimo_revisado.get_estado_display }}</span>
+                        <a href="#" class="document-link">Ver/Subir Documento</a>
+                    </div>
+                {% else %}
+                    <p class="text-sm text-gray-500">No hay revisados registrados.</p>
+                {% endif %}
+                {% endwith %}
+            </div>
+
+            <!-- Tarjeta de Pesos y Dimensiones (última) -->
+            <div class="document-item">
+                <h3 class="font-semibold text-gray-700">Tarjeta de Pesos y Dimensiones</h3>
+                {% with tarjetas_pd.first as ultima_tarjeta %}
+                {% if ultima_tarjeta %}
+                     <div class="document-details">
+                        <span class="status-badge status-{{ ultima_tarjeta.estado|lower }}">{{ ultima_tarjeta.get_estado_display }}</span>
+                        <a href="#" class="document-link">Ver/Subir Documento</a>
+                    </div>
+                {% else %}
+                    <p class="text-sm text-gray-500">No aplica o no hay tarjeta registrada.</p>
+                {% endif %}
+                {% endwith %}
+            </div>
+
+            <!-- Sticker de Placa (último) -->
+            <div class="document-item">
+                <h3 class="font-semibold text-gray-700">Sticker de Placa</h3>
+                {% with doc_stickers_placa.first as ultimo_sticker %}
+                {% if ultimo_sticker %}
+                    <div class="document-details">
+                        <span class="status-badge status-{{ vehiculo.estado_placa|lower }}">{{ vehiculo.get_estado_placa_display }}</span>
+                        <a href="{{ ultimo_sticker.archivo_pdf.url }}" target="_blank" class="document-link">Ver Documento</a>
+                    </div>
+                {% else %}
+                    <p class="text-sm text-gray-500">No hay sticker registrado.</p>
+                {% endif %}
+                {% endwith %}
+            </div>
+
+            <!-- Recibo de Pago de Placa (último) -->
+            <div class="document-item">
+                <h3 class="font-semibold text-gray-700">Recibo de Pago de Placa</h3>
+                {% with doc_recibos_placa.first as ultimo_recibo %}
+                {% if ultimo_recibo %}
+                    <div class="document-details">
+                         <span class="status-badge status-vigente">Pagado</span>
+                        <a href="{{ ultimo_recibo.archivo_pdf.url }}" target="_blank" class="document-link">Ver Recibo</a>
+                    </div>
+                {% else %}
+                     <p class="text-sm text-gray-500">No hay recibos de pago registrados.</p>
+                {% endif %}
+                {% endwith %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .document-item { @apply bg-gray-50 p-4 rounded-lg; }
+    .document-details { @apply flex justify-between items-center mt-1; }
+    .status-badge { @apply text-xs font-semibold py-1 px-3 rounded-full uppercase; }
+    .status-vigente { @apply bg-green-200 text-green-800; }
+    .status-por_vencer { @apply bg-yellow-200 text-yellow-800; }
+    .status-vencido { @apply bg-red-200 text-red-800; }
+    .document-link { @apply text-sm text-blue-600 hover:text-blue-800 font-semibold; }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const modal = document.getElementById('guantera-modal');
+    const openBtn = document.getElementById('open-guantera-btn');
+    const closeBtn = document.getElementById('close-guantera-btn');
+
+    const openModal = () => modal.classList.remove('hidden');
+    const closeModal = () => modal.classList.add('hidden');
+
+    openBtn.addEventListener('click', openModal);
+    closeBtn.addEventListener('click', closeModal);
+    
+    modal.addEventListener('click', function(event) {
+        if (event.target === modal) {
+            closeModal();
+        }
+    });
+
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            closeModal();
+        }
+    });
+});
+</script>
 {% endblock %}

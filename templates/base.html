@@ -11,7 +11,10 @@
 
     <nav class="bg-gray-800 p-4 shadow-lg sticky top-0 z-50">
         <div class="container mx-auto flex justify-between items-center">
-            <a class="text-white text-xl font-bold" href="{% url 'home' %}">Mi App</a>
+            <!-- Logo de la Empresa -->
+            <a href="{% url 'home' %}" class="flex-shrink-0">
+                <img class="h-8 w-auto" src="{% static 'images/logo.png' %}" alt="[Logo de la Empresa]">
+            </a>
             
             <!-- Links para escritorio -->
             <div class="hidden md:flex items-center space-x-4">
