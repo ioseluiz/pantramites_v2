@@ -24,7 +24,7 @@ if DEBUG == "True":
 else:
     DEBUG = False
 
-ALLOWED_HOSTS = [os.getenv("ALLOWED_HOSTS")]
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "").split(",")
 print(ALLOWED_HOSTS)
 
 # Application definition
