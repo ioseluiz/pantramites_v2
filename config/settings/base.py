@@ -25,7 +25,7 @@ else:
     DEBUG = False
 
 ALLOWED_HOSTS = [os.getenv("ALLOWED_HOSTS")]
-
+print(ALLOWED_HOSTS)
 
 # Application definition
 THIRD_PARTY_APPS = ["storages"]
